@@ -126,6 +126,9 @@ static const struct uart_ops_s g_uart_ops =
   .receive        = up_receive,
   .rxint          = up_rxint,
   .rxavailable    = up_rxavailable,
+#ifdef CONFIG_SERIAL_IFLOWCONTROL
+  .rxflowcontrol  = NULL,
+#endif
   .send           = up_send,
   .txint          = up_txint,
   .txready        = up_txready,
@@ -705,7 +708,7 @@ static int up_interrupt(int irq, void *context)
            * generated after several bytes have been recevied and enable
            * the RX timout.
            */
- 
+
           up_rxto_enable(priv);
         }
 
@@ -727,7 +730,7 @@ static int up_interrupt(int irq, void *context)
          regval = up_serialin(priv, NUC_UART_MCR_OFFSET);
          up_serialout(priv, NUC_UART_MCR_OFFSET, regval | UART_MSR_DCTSF);
         }
-      
+
       /* Check for line status or buffer errors*/
 
       if ((isr & UART_ISR_RLS_INT) != 0 ||

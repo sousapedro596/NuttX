@@ -121,11 +121,18 @@ examples/configdata
 
   This is a Unit Test for the MTD configuration data driver
 
+examples/cpuhog
+^^^^^^^^^^^^^^^
+
+  Attempts to keep the system busy by passing data through a pipe in loop
+  back mode.  This may be useful if you are trying run down other problems
+  that you think might only occur when the system is very busy.
+
 examples/cxxtest
 ^^^^^^^^^^^^^^^^
 
   This is a test of the C++ standard library.  At present a port of the uClibc++
-  C++ library is available.  Due to licensinging issues, the uClibc++ C++ library
+  C++ library is available.  Due to licensing issues, the uClibc++ C++ library
   is not included in the NuttX source tree by default, but must be installed
   (see misc/uClibc++/README.txt for installation).
 
@@ -703,7 +710,7 @@ examples/nsh
 
     CONFIG_NETUTILS_UIPLIB=y
     CONFIG_NETUTILS_DHCPC=y
-    CONFIG_NETUTILS_RESOLV=y
+    CONFIG_NETUTILS_DNSCLIENT=y
     CONFIG_NETUTILS_TFTPC=y
     CONFIG_NETUTILS_WEBCLIENT=y
 
@@ -1442,6 +1449,20 @@ examples/sendmail
     CONFIG_NETUTILS_UIPLIB=y
     CONFIG_NETUTILS_SMTP=y
 
+examples/serialblaster
+^^^^^^^^^^^^^^^^^^^^^^
+
+  Sends a repeating pattern (the alphabet) out a serial port continuously.
+  This may be useful if you are trying run down other problems that you
+  think might only occur when the serial port usage is high.
+
+examples/serialrx
+^^^^^^^^^^^^^^^^^
+
+  Constant receives serial data.  This is the complement to serialblaster.
+  This may be useful if you are trying run down other problems that you
+  think might only occur when the serial port usage is high.
+
 examples/serloop
 ^^^^^^^^^^^^^^^^
 
@@ -1683,7 +1704,7 @@ examples/uip
 
     CONFIG_NETUTILS_UIPLIB=y
     CONFIG_NETUTILS_DHCPC=y
-    CONFIG_NETUTILS_RESOLV=y
+    CONFIG_NETUTILS_DNSCLIENT=y
     CONFIG_NETUTILS_WEBSERVER=y
 
   NOTE:  This example does depend on the perl script at
@@ -1905,7 +1926,7 @@ examples/wget
   libraries in the defconfig file:
 
     CONFIG_NETUTILS_UIPLIB=y
-    CONFIG_NETUTILS_RESOLV=y
+    CONFIG_NETUTILS_DNSCLIENT=y
     CONFIG_NETUTILS_WEBCLIENT=y
 
 examples/wget

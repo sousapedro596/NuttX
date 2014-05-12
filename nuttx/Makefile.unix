@@ -1,7 +1,7 @@
 ############################################################################
 # Makefile.unix
 #
-#   Copyright (C) 2007-2012 Gregory Nutt. All rights reserved.
+#   Copyright (C) 2007-2012, 2014 Gregory Nutt. All rights reserved.
 #   Author: Gregory Nutt <gnutt@nuttx.org>
 #
 # Redistribution and use in source and binary forms, with or without
@@ -675,6 +675,14 @@ ifeq ($(CONFIG_RAW_BINARY),y)
 	@echo "CP: $(BIN).bin"
 	$(Q) $(OBJCOPY) $(OBJCOPYARGS) -O binary $(BIN) $(BIN).bin
 endif
+ifeq ($(CONFIG_UBOOT_UIMAGE),y)
+	@echo "MKIMAGE: uImage"
+	$(Q) mkimage -A arm -O linux -C none -T kernel -a $(CONFIG_UIMAGE_LOAD_ADDRESS) \
+		-e $(CONFIG_UIMAGE_ENTRY_POINT) -n $(BIN) -d $(BIN).bin uImage
+	$(Q) if [ -w /tftpboot ] ; then \
+		cp -f uImage /tftpboot/uImage; \
+	fi
+endif
 
 # $(BIN)
 #
@@ -699,12 +707,12 @@ download: $(BIN)
 # pass1dep: Create pass1 build dependencies
 # pass2dep: Create pass2 build dependencies
 
-pass1dep: context tools/mkdeps$(HOSTEXEEXT) 
+pass1dep: context tools/mkdeps$(HOSTEXEEXT)
 	$(Q) for dir in $(USERDEPDIRS) ; do \
 		$(MAKE) -C $$dir TOPDIR="$(TOPDIR)" depend ; \
 	done
 
-pass2dep: context tools/mkdeps$(HOSTEXEEXT) 
+pass2dep: context tools/mkdeps$(HOSTEXEEXT)
 	$(Q) for dir in $(KERNDEPDIRS) ; do \
 		$(MAKE) -C $$dir TOPDIR="$(TOPDIR)" EXTRADEFINES=$(KDEFINE) depend; \
 	done

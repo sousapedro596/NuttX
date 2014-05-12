@@ -152,7 +152,10 @@
 #  undef CONFIG_USART2_SERIAL_CONSOLE
 #  define HAVE_CONSOLE 1
 #else
-#  warning "No valid CONFIG_USARTn_SERIAL_CONSOLE Setting"
+#  ifndef CONFIG_NO_SERIAL_CONSOLE
+#    warning "No valid CONFIG_USARTn_SERIAL_CONSOLE Setting"
+#  endif
+
 #  undef CONFIG_UART0_SERIAL_CONSOLE
 #  undef CONFIG_UART1_SERIAL_CONSOLE
 #  undef CONFIG_USART0_SERIAL_CONSOLE
@@ -378,6 +381,9 @@ static const struct uart_ops_s g_uart_ops =
   .receive        = up_receive,
   .rxint          = up_rxint,
   .rxavailable    = up_rxavailable,
+#ifdef CONFIG_SERIAL_IFLOWCONTROL
+  .rxflowcontrol  = NULL,
+#endif
   .send           = up_send,
   .txint          = up_txint,
   .txready        = up_txready,
@@ -739,8 +745,13 @@ static int up_setup(struct uart_dev_s *dev)
 
   up_serialout(priv, SAM_UART_MR_OFFSET, regval);
 
-  /* Configure the console baud.  NOTE: Oversampling by 8 is not supported.
-   * This may limit BAUD rates for lower USART clocks.
+  /* Configure the console baud:
+   *
+   *   Fbaud   = USART_CLOCK / (16 * divisor)
+   *   divisor = USART_CLOCK / (16 * Fbaud)
+   *
+   * NOTE: Oversampling by 8 is not supported. This may limit BAUD rates
+   * for lower USART clocks.
    */
 
   regval  = (SAM_USART_CLOCK + (priv->baud << 3))/(priv->baud << 4);
@@ -923,7 +934,7 @@ static int up_interrupt(int irq, void *context)
            handled = true;
         }
 
-      /* Handle outgoing, transmit bytes. XRDY: There is no character in the
+      /* Handle outgoing, transmit bytes. TXRDY: There is no character in the
        * US_THR.
        */
 
@@ -1212,64 +1223,6 @@ void up_serialinit(void)
 #ifdef TTYS5_DEV
   (void)uart_register("/dev/ttyS5", &TTYS5_DEV);
 #endif
-}
-
-/****************************************************************************
- * Name: up_putc
- *
- * Description:
- *   Provide priority, low-level access to support OS debug  writes
- *
- ****************************************************************************/
-
-int up_putc(int ch)
-{
-#ifdef HAVE_CONSOLE
-  struct up_dev_s *priv = (struct up_dev_s*)CONSOLE_DEV.priv;
-  uint32_t imr;
-
-  up_disableallints(priv, &imr);
-
-  /* Check for LF */
-
-  if (ch == '\n')
-    {
-      /* Add CR */
-
-      up_lowputc('\r');
-    }
-
-  up_lowputc(ch);
-  up_restoreusartint(priv, imr);
-#endif
-  return ch;
-}
-
-#else /* USE_SERIALDRIVER */
-
-/****************************************************************************
- * Name: up_putc
- *
- * Description:
- *   Provide priority, low-level access to support OS debug writes
- *
- ****************************************************************************/
-
-int up_putc(int ch)
-{
-#ifdef HAVE_CONSOLE
-  /* Check for LF */
-
-  if (ch == '\n')
-    {
-      /* Add CR */
-
-      up_lowputc('\r');
-    }
-
-  up_lowputc(ch);
-#endif
-  return ch;
 }
 
 #endif /* USE_SERIALDRIVER */

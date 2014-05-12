@@ -487,7 +487,7 @@ static ssize_t uart_write(FAR struct file *filep, FAR const char *buffer,
               /* No data was transferred. Return the negated errno value.
                * The VFS layer will set the errno value appropriately).
                */
- 
+
               nwritten = ret;
             }
         }
@@ -766,6 +766,17 @@ static ssize_t uart_read(FAR struct file *filep, FAR char *buffer, size_t buflen
             }
         }
     }
+
+#ifdef CONFIG_SERIAL_IFLOWCONTROL
+  if (dev->recv.head == dev->recv.tail)
+    {
+      /* We might leave Rx interrupt disabled if full recv buffer was read
+       * empty. Enable Rx interrupt to make sure that more input is received.
+       */
+
+      uart_enablerxint(dev);
+    }
+#endif
 
   uart_givesem(&dev->recv.sem);
   return recvd;

@@ -2,7 +2,7 @@
  * netuip/uip_input.c
  * The uIP TCP/IP stack code.
  *
- *   Copyright (C) 2007-2009, 2013 Gregory Nutt. All rights reserved.
+ *   Copyright (C) 2007-2009, 2013-2014 Gregory Nutt. All rights reserved.
  *   Author: Gregory Nutt <gnutt@nuttx.org>
  *
  * Adapted for NuttX from logic in uIP which also has a BSD-like license:
@@ -65,7 +65,7 @@
  * a byte stream if needed. The application will not be fed with data
  * that is out of sequence.
  *
- * If the application whishes to send data to the peer, it should put
+ * If the application wishes to send data to the peer, it should put
  * its data into the d_buf. The d_appdata pointer points to the
  * first available byte. The TCP/IP stack will calculate the
  * checksums, and fill in the necessary header fields and finally send
@@ -166,7 +166,7 @@ static uint8_t uip_reass(void)
     }
 
   /* Check if the incoming fragment matches the one currently present
-   * in the reasembly buffer. If so, we proceed with copying the
+   * in the reassembly buffer. If so, we proceed with copying the
    * fragment into the buffer.
    */
 
@@ -297,7 +297,6 @@ nullreturn:
  *         yet.  Currently useful for UDP when a packet arrives before a recv
  *         call is in place.
  *
- *
  * Assumptions:
  *
  ****************************************************************************/
@@ -329,6 +328,7 @@ int uip_input(struct uip_driver_s *dev)
       nlldbg("Invalid IPv6 version: %d\n", pbuf->vtc >> 4);
       goto drop;
     }
+
 #else /* CONFIG_NET_IPv6 */
   /* Check validity of the IP header. */
 
@@ -453,11 +453,18 @@ int uip_input(struct uip_driver_s *dev)
 #ifndef CONFIG_NET_IPv6
       if (!uip_ipaddr_cmp(uip_ip4addr_conv(pbuf->destipaddr), dev->d_ipaddr))
         {
-#ifdef CONFIG_NET_STATISTICS
-          uip_stat.ip.drop++;
+#ifdef CONFIG_NET_IGMP
+          uip_ipaddr_t destip = uip_ip4addr_conv(pbuf->destipaddr);
+          if (uip_grpfind(dev, &destip) == NULL)
 #endif
-          goto drop;
+            {
+#ifdef CONFIG_NET_STATISTICS
+              uip_stat.ip.drop++;
+#endif
+              goto drop;
+            }
         }
+
 #else /* CONFIG_NET_IPv6 */
       /* For IPv6, packet reception is a little trickier as we need to
        * make sure that we listen to certain multicast addresses (all

@@ -145,6 +145,10 @@ config ARCH_NAND_HWECC
 	bool
 	default n
 
+config ARCH_HAVE_EXTCLK
+	bool
+	default n
+
 menuconfig PAGING
 	bool "On-demand paging"
 	default n
@@ -292,6 +296,13 @@ config ARCH_STACKDUMP
 	---help---
 		Enable to do stack dumps after assertions
 
+config ARCH_USBDUMP
+	bool "Dump USB trace data"
+	default n
+	depends on USBDEV_TRACE
+	---help---
+		Enable to do USB trace after assertions
+
 config ENDIAN_BIG
 	bool "Big Endian Architecture"
 	default n
@@ -336,7 +347,7 @@ config ARCH_HAVE_RAMFUNCS
 
 config ARCH_RAMFUNCS
 	bool "Copy functions to RAM on startup"
-	default n
+	default y
 	depends on ARCH_HAVE_RAMFUNCS
 	---help---
 		Copy some functions to RAM at boot time.  This is done in some

@@ -291,7 +291,7 @@ static int nsh_waitusbready(void)
  *   single an NSH instance that operates on stdin and stdout.  This
  *   function does not return.
  *
- *   This function handles generic /dev/console character devices, or 
+ *   This function handles generic /dev/console character devices, or
  *   special USB console devices.  The USB console requires some special
  *   operations to handle the cases where the session is lost when the
  *   USB device is unplugged and restarted when the USB device is plugged
@@ -304,7 +304,7 @@ static int nsh_waitusbready(void)
  * Returned Values:
  *   This function does not return nor does it ever exit (unless the user
  *   executes the NSH exit command).
- *  
+ *
  ****************************************************************************/
 
 #ifdef HAVE_USB_CONSOLE
@@ -329,6 +329,8 @@ int nsh_consolemain(int argc, char *argv[])
 #else
   ret = usbdev_serialinitialize(CONFIG_NSH_USBDEV_MINOR);
 #endif
+
+  (void)ret; /* Eliminate warning if not used */
   DEBUGASSERT(ret == OK);
 #endif
 
@@ -353,6 +355,8 @@ int nsh_consolemain(int argc, char *argv[])
        */
 
       ret = nsh_waitusbready();
+
+      (void)ret; /* Eliminate warning if not used */
       DEBUGASSERT(ret == OK);
 
       /* Execute the session */
@@ -380,7 +384,7 @@ int nsh_consolemain(int argc, char *argv[])
  *
  * Returned Values:
  *   None
- *  
+ *
  ****************************************************************************/
 
 #ifdef CONFIG_NSH_USBDEV_TRACE

@@ -56,7 +56,7 @@
 #include <nuttx/kmalloc.h>
 #include <nuttx/fs/fs.h>
 #include <nuttx/arch.h>
-#include <nuttx/ramlog.h>
+#include <nuttx/syslog/ramlog.h>
 
 #include <arch/irq.h>
 
@@ -143,7 +143,7 @@ static char g_sysbuffer[CONFIG_RAMLOG_CONSOLE_BUFSIZE];
  * could be called before the driver initialization logic executes.
  */
 
-static struct ramlog_dev_s g_sysdev = 
+static struct ramlog_dev_s g_sysdev =
 {
 #ifndef CONFIG_RAMLOG_NONBLOCKING
   0,                             /* rl_nwaiters */
@@ -338,7 +338,7 @@ static ssize_t ramlog_read(FAR struct file *filep, FAR char *buffer, size_t len)
            * mutual exclusion semaphore?
            */
 
-          if (ret < 0) 
+          if (ret < 0)
             {
               /* No.. One of the two sem_wait's failed. */
 
@@ -584,7 +584,7 @@ int ramlog_poll(FAR struct file *filep, FAR struct pollfd *fds, bool setup)
         {
           ndx = 0;
         }
-  
+
       if (ndx != priv->rl_tail)
        {
          eventset |= POLLOUT;
@@ -638,7 +638,6 @@ errout:
  *
  * Description:
  *   Create the RAM logging device and register it at the specified path.
- *   Mostly likely this path will be /dev/console
  *
  ****************************************************************************/
 
@@ -683,8 +682,7 @@ int ramlog_register(FAR const char *devpath, FAR char *buffer, size_t buflen)
  * Name: ramlog_consoleinit
  *
  * Description:
- *   Create the RAM logging device and register it at the specified path.
- *   Mostly likely this path will be /dev/console
+ *   Use a pre-allocated RAM logging device and register it at /dev/console
  *
  ****************************************************************************/
 
@@ -703,8 +701,8 @@ int ramlog_consoleinit(void)
  * Name: ramlog_sysloginit
  *
  * Description:
- *   Create the RAM logging device and register it at the specified path.
- *   Mostly likely this path will be CONFIG_RAMLOG_SYSLOG
+ *   Use a pre-allocated RAM logging device and register it at the path
+ *   specified by CONFIG_RAMLOG_SYSLOG
  *
  *   If CONFIG_RAMLOG_CONSOLE is also defined, then this functionality is
  *   performed when ramlog_consoleinit() is called.

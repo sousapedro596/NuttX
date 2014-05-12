@@ -1,7 +1,7 @@
 /************************************************************************************
- * configs/sama5df3x-ek/include/board_396mhz.h
+ * configs/sama5d3x-ek/include/board_396mhz.h
  *
- *   Copyright (C) 2013 Gregory Nutt. All rights reserved.
+ *   Copyright (C) 2013-2014 Gregory Nutt. All rights reserved.
  *   Author: Gregory Nutt <gnutt@nuttx.org>
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,7 @@
 #include <nuttx/config.h>
 
 /************************************************************************************
- * Definitions
+ * Pre-processor Definitions
  ************************************************************************************/
 
 /* Clocking *************************************************************************/
@@ -115,7 +115,7 @@
 #define BOARD_ADC_PRESCAL          (7)
 #define BOARD_TSD_STARTUP          (40)        /* 40 nanoseconds */
 #define BOARD_TSD_TRACKTIM         (2000)      /* Min 1µs at 8MHz */
-#define BOARD_TSD_DEBOUNCE         (10000000)  /* 10 milliseconds (unis nanoseconds) */
+#define BOARD_TSD_DEBOUNCE         (10000000)  /* 10 milliseconds (units nanoseconds) */
 
 /* Resulting frequencies */
 
@@ -180,19 +180,6 @@
 
 #define HSMCI_SDXFR_CLKDIV         (2 << HSMCI_MR_CLKDIV_SHIFT)
 #define HSMCI_SDWIDEXFR_CLKDIV     HSMCI_SDXFR_CLKDIV
-
-/* FLASH wait states
- *
- * FWS Max frequency
- *     1.62V 1.8V
- * --- ----- ------
- *  0  24MHz 27MHz
- *  1  40MHz 47MHz
- *  2  72MHz 84MHz
- *  3  84MHz 96MHz
- */
-
-#define BOARD_FWS                  3
 
 /************************************************************************************
  * Public Data

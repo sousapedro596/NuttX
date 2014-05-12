@@ -208,7 +208,7 @@ static void unload_callback(int signo, siginfo_t *info, void *ucontext)
 
   if (!info || signo != SIGCHLD)
     {
-      blldbg("ERROR:Bad signal callback: signo=%d info=%p\n", signo, callback);
+      blldbg("ERROR:Bad signal callback: signo=%d info=%p\n", signo, info);
       return;
     }
 
@@ -318,7 +318,7 @@ int schedule_unload(pid_t pid, FAR struct binary_s *bin)
         {
           blldbg("ERROR: Failed to remove structure\n");
         }
-      
+
       goto errout;
     }
 

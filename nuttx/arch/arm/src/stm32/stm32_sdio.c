@@ -453,8 +453,10 @@ static int  stm32_registercallback(FAR struct sdio_dev_s *dev,
 
 #ifdef CONFIG_SDIO_DMA
 static bool stm32_dmasupported(FAR struct sdio_dev_s *dev);
+#ifdef CONFIG_SDIO_PREFLIGHT
 static int  stm32_dmapreflight(FAR struct sdio_dev_s *dev,
-              FAR uint8_t *buffer, size_t buflen);
+              FAR const uint8_t *buffer, size_t buflen);
+#endif
 static int  stm32_dmarecvsetup(FAR struct sdio_dev_s *dev,
               FAR uint8_t *buffer, size_t buflen);
 static int  stm32_dmasendsetup(FAR struct sdio_dev_s *dev,
@@ -503,7 +505,9 @@ struct stm32_dev_s g_sdiodev =
     .registercallback = stm32_registercallback,
 #ifdef CONFIG_SDIO_DMA
     .dmasupported     = stm32_dmasupported,
+#ifdef CONFIG_SDIO_PREFLIGHT
     .dmapreflight     = stm32_dmapreflight,
+#endif
     .dmarecvsetup     = stm32_dmarecvsetup,
     .dmasendsetup     = stm32_dmasendsetup,
 #endif
@@ -1668,9 +1672,11 @@ static int stm32_attach(FAR struct sdio_dev_s *dev)
 
       up_enable_irq(STM32_IRQ_SDIO);
 
-      /* Set the interrrupt priority */
+#ifdef CONFIG_ARCH_IRQPRIO
+      /* Set the interrupt priority */
 
       up_prioritize_irq(STM32_IRQ_SDIO, CONFIG_SDIO_PRI);
+#endif
     }
 
   return ret;
@@ -2468,9 +2474,9 @@ static bool stm32_dmasupported(FAR struct sdio_dev_s *dev)
  *   OK on success; a negated errno on failure
  ****************************************************************************/
 
-#ifdef CONFIG_SDIO_DMA
-static int stm32_dmapreflight(FAR struct sdio_dev_s *dev, FAR uint8_t *buffer,
-                              size_t buflen)
+#if defined(CONFIG_SDIO_DMA) && defined(CONFIG_SDIO_PREFLIGHT)
+static int stm32_dmapreflight(FAR struct sdio_dev_s *dev,
+                              FAR const uint8_t *buffer, size_t buflen)
 {
   struct stm32_dev_s *priv = (struct stm32_dev_s *)dev;
 
@@ -2521,7 +2527,9 @@ static int stm32_dmarecvsetup(FAR struct sdio_dev_s *dev, FAR uint8_t *buffer,
   uint32_t dblocksize;
 
   DEBUGASSERT(priv != NULL && buffer != NULL && buflen > 0);
+#ifdef CONFIG_SDIO_PREFLIGHT
   DEBUGASSERT(stm32_dmapreflight(dev, buffer, buflen) == 0);
+#endif
 
   /* Reset the DPSM configuration */
 
@@ -2588,7 +2596,9 @@ static int stm32_dmasendsetup(FAR struct sdio_dev_s *dev,
   uint32_t dblocksize;
 
   DEBUGASSERT(priv != NULL && buffer != NULL && buflen > 0);
+#ifdef CONFIG_SDIO_PREFLIGHT
   DEBUGASSERT(stm32_dmapreflight(dev, buffer, buflen) == 0);
+#endif
 
   /* Reset the DPSM configuration */
 

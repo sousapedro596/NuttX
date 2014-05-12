@@ -89,20 +89,34 @@ config ARCH_CHIP_ATSAMA5D35
 	select SAMA5_HAVE_TC1
 	select ARCH_NAND_HWECC
 
+config ARCH_CHIP_ATSAMA5D36
+	bool "Atmel ATSAMA5D356"
+	select ARCH_CHIP_SAMA5D3
+	select SAMA5_HAVE_EMAC
+	select SAMA5_HAVE_GMAC
+	select SAMA5_HAVE_HSMCI2
+	select SAMA5_HAVE_LCDC
+	select SAMA5_HAVE_UART0
+	select SAMA5_HAVE_UART1
+	select SAMA5_HAVE_CAN0
+	select SAMA5_HAVE_CAN1
+	select SAMA5_HAVE_TC1
+	select ARCH_NAND_HWECC
+
 endchoice # Atmel AT91SAMA5 Chip Selection
 
 menu "SAMA5 Peripheral Support"
 
 config SAMA5_DBGU
-	bool "Debug Unit Interrupt (DBGU)"
+	bool "Debug Unit (DBGU)"
 	default n
 
 config SAMA5_PIT
-	bool "Periodic Interval Timer Interrupt (PIT)"
+	bool "Periodic Interval Timer (PIT)"
 	default n
 
 config SAMA5_WDT
-	bool "Watchdog timer Interrupt (WDT)"
+	bool "Watchdog timer (WDT)"
 	default n
 	select WATCHDOG
 
@@ -203,7 +217,7 @@ config SAMA5_PWM
 	select PWM
 
 config SAMA5_ADC
-	bool "Touch Screen ADC Controller (ADC)"
+	bool "Touch Screen / ADC Controller (ADC)"
 	default n
 	select ANALOG
 	select ADC
@@ -225,7 +239,6 @@ config SAMA5_UHPHS
 config SAMA5_UDPHS
 	bool "USB Device High Speed (UDPHS)"
 	default n
-	depends on SAMA5_HAVE_GMAC
 
 config SAMA5_GMAC
 	bool "Gigabit Ethernet MAC (GMAC)"
@@ -255,12 +268,14 @@ config SAMA5_SSC0
 	default n
 	select I2S
 	depends on SAMA5_DMAC0
+	select AUDIO
 
 config SAMA5_SSC1
 	bool "Synchronous Serial Controller 1 (SSC1)"
 	default n
 	select I2S
 	depends on SAMA5_DMAC1
+	select AUDIO
 
 config SAMA5_CAN0
 	bool "CAN controller 0 (CAN0)"
@@ -287,7 +302,7 @@ config SAMA5_TDES
 config SAMA5_TRNG
 	bool "True Random Number Generator (TRNG)"
 	default n
-	select DEV_RANDOM
+	select ARCH_HAVE_RNG
 
 config SAMA5_ARM
 	bool "Performance Monitor Unit (ARM)"
@@ -331,6 +346,57 @@ config SAMA5_PIOE_IRQ
 	default n
 
 endif # PIO_IRQ
+
+menu "DBGU Configuration"
+	depends on SAMA5_DBGU
+
+config SAMA5_DBGU_CONSOLE
+	bool "DBGU serial console"
+	---help---
+		Select to use the DBGU as the serial console.
+
+config SAMA5_DBGU_RXBUFSIZE
+	int "Receive buffer size"
+	default 256
+	---help---
+		Characters are buffered as they are received. This specifies
+		the size of the receive buffer.
+
+config SAMA5_DBGU_TXBUFSIZE
+	int "Transmit buffer size"
+	default 256
+	---help---
+		Characters are buffered before being sent.  This specifies
+		the size of the transmit buffer.
+
+config SAMA5_DBGU_NOCONFIG
+	bool "Suppress DBGU configuration"
+	default n
+	depends on SAMA5_BOOT_SDRAM && SAMA5_DBGU_CONSOLE
+	---help---
+		The DBGU is often used by bootloaders to provide the bootloader
+		interface.  If the DBGU is also used as the NuttX console, then it
+		would be best to avoid reconfiguring the DBGU so that the user
+		experience is seamless going from the bootloader to the NuttX
+		console.
+
+if !SAMA5_DBGU_NOCONFIG
+
+config SAMA5_DBGU_BAUD
+	int "BAUD rate"
+	default 115200
+	---help---
+		The configured BAUD of the UART.
+
+config SAMA5_DBGU_PARITY
+	int "Parity setting"
+	default 0
+	range 0 2
+	---help---
+		0=no parity, 1=odd parity, 2=even parity
+
+endif # !SAMA5_DBGU_NOCONFIG
+endmenu #DBGU Configuration
 
 if SAMA5_LCDC
 menu "LCDC Configuration"
@@ -869,7 +935,7 @@ choice
 	prompt "GMAC Speed"
 	default SAMA5_GMAC_ETH100MBPS
 	---help---
-		If autonegation is not used, then you must select the fixed speed
+		If autonegotiation is not used, then you must select the fixed speed
 		of the PHY
 
 config SAMA5_GMAC_ETH10MBPS
@@ -1310,7 +1376,7 @@ config SAMA5_CAN_REGDEBUG
 		Output detailed register-level CAN device debug information.
 		Requires also DEBUG.
 
-endmenu # SPI device driver options
+endmenu # CAN device driver options
 endif # SAMA5_CAN0 || SAMA5_CAN1
 
 if SAMA5_SPI0 || SAMA5_SPI1
@@ -1512,9 +1578,9 @@ config SAMA5_SSC0_MCKDIV_SAMPLERATE
 	depends on SAMA5_SSC0_RX_MCKDIV || SAMA5_SSC0_TX_MCKDIV
 	---help---
 		If the either the receiver or transmitter clock is provided by MCK/2 divided
-		down, then the samplerate must be provided.  The bitrate will be the product
+		down, then the sample rate must be provided.  The bit rate will be the product
 		of the sample rate and the data width.  The SSC driver will determine the best
-		divider to obtain that bitrate (up to 4095).  If the bitrate can be realized
+		divider to obtain that bit rate (up to 4095).  If the bit rate can be realized
 		by dividing down the MCK/2, a compile time error will occur.
 
 config SAMA5_SSC0_LOOPBACK
@@ -1524,7 +1590,7 @@ config SAMA5_SSC0_LOOPBACK
 	---help---
 		If both the receiver and transmitter are enabled, then the SSC can
 		be configured in loopback mode.  This setting selects SSC loopback
-		and will cause the LOOP bit to be set in the SSC_RFMR regsiter. In
+		and will cause the LOOP bit to be set in the SSC_RFMR register. In
 		this case, RD is connected to TD, RF is connected to TF and RK is
 		connected to TK.
 
@@ -1646,9 +1712,9 @@ config SAMA5_SSC1_MCKDIV_SAMPLERATE
 	depends on SAMA5_SSC1_RX_MCKDIV || SAMA5_SSC1_TX_MCKDIV
 	---help---
 		If the either the receiver or transmitter clock is provided by MCK/2 divided
-		down, then the samplerate must be provided.  The bitrate will be the product
+		down, then the sample rate must be provided.  The bit rate will be the product
 		of the sample rate and the data width.  The SSC driver will determine the best
-		divider to obtain that bitrate (up to 4095).  If the bitrate can be realized
+		divider to obtain that bit rate (up to 4095).  If the bit rate can be realized
 		by dividing down the MCK/2, a compile time error will occur.
 
 config SAMA5_SSC1_LOOPBACK
@@ -1658,7 +1724,7 @@ config SAMA5_SSC1_LOOPBACK
 	---help---
 		If both the receiver and transmitter are enabled, then the SSC can
 		be configured in loopback mode.  This setting selects SSC loopback
-		and will cause the LOOP bit to be set in the SSC_RFMR regsiter. In
+		and will cause the LOOP bit to be set in the SSC_RFMR register. In
 		this case, RD is connected to TD, RF is connected to TF and RK is
 		connected to TK.
 
@@ -1767,7 +1833,7 @@ config SAMA5_UDPHS_NDTDS
 	default 9
 	depends on UDPHS_SCATTERGATHER
 	---help---
-		DMA tranfer descriptors are allocated in a pool at boot time.  This
+		DMA transfer descriptors are allocated in a pool at boot time.  This
 		setting provides the number of DMA transfer descriptors to be
 		allocated.
 
@@ -1776,17 +1842,17 @@ config SAMA5_UDPHS_PREALLOCATE
 	default y
 	depends on UDPHS_SCATTERGATHER
 	---help---
-		If this option is selected then DMA tranfer descriptors will be
+		If this option is selected then DMA transfer descriptors will be
 		pre-allocated in .bss.  Otherwise, the descriptors will be allocated
 		at start-up time with kmalloc().  This might be important if a larger
 		memory pool is available after startup.
 
 config SAMA5_UDPHS_REGDEBUG
-	bool "Enable low-level UPPHS register debug"
+	bool "Enable low-level UDPHS register debug"
 	default n
 	depends on DEBUG
 
-endmenu # USB High Speed Host Device driver (DCD) options
+endmenu # USB High Speed Device Controller driver (DCD) options
 endif # SAMA5_UDPHS
 
 if SAMA5_UHPHS
@@ -3500,11 +3566,11 @@ config SAMA5_BOOT_ISRAM
 
 config SAMA5_BOOT_SDRAM
 	bool "Running from external SDRAM"
-	depends on SAMA5_DDRCS
 
 config SAMA5_BOOT_CS0FLASH
 	bool "Running in external FLASH CS0"
 	depends on SAMA5_EBICS0_NOR
+	select ARCH_HAVE_RAMFUNCS
 
 config SAMA5_BOOT_CS0SRAM
 	bool "Running in external FLASH CS0"
@@ -3548,9 +3614,19 @@ config SAMA5_ISRAM_HEAP
 		NOTE:  MM_REGIONS must also be set to indicate the total number of
 		memory regions to be added to the heap.
 
-		*** DO NOT SELECT THIS OPTION IF YOU ARE EXECUTING FROM INTERNAL SRAM!!**
+		*** DO NOT SELECT THIS OPTION IF YOU ARE EXECUTING FROM INTERNAL SRAM!! **
 		In this case, the remaining ISRAM will automatically be added to the
 		heap (using RAM_END).
+
+		*** RAMFUNCS WARNING **
+		If you execute from NOR FLASH, RAM functions will be enabled.  The
+		RAM functions will be positioned in SRAM in the same location as the
+		ISRAM heap and, as a result, those RAM functions will be destroyed
+		after the heap is initialized.  That is not a problem now since
+		these RAM functions are only used in the early boot phase.  If,
+		however, you should wish to preserve the RAM functions, then you
+		should also disable SAMA5_ISRAM_HEAP so that the RAM functions are
+		preserved beyond the boot phase.
 
 config SAMA5_DDRCS_HEAP
 	bool "Include DDR-SDRAM in heap"

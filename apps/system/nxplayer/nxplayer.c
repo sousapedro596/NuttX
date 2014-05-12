@@ -169,7 +169,7 @@ static int nxplayer_opendevice(FAR struct nxplayer_s *pPlayer, int format,
        */
 
       if (((pPlayer->prefformat & (1 << (format - 1)) == 0) ||
-          ((pPlayer->preftype & AUDIO_TYPE_OUTPUT) == 0))
+          ((pPlayer->preftype & AUDIO_TYPE_OUTPUT) == 0)))
         {
           /* Format not supported by the device */
 
@@ -253,7 +253,7 @@ static int nxplayer_opendevice(FAR struct nxplayer_s *pPlayer, int format,
 
                           caps.ac_subtype = format;
                           caps.ac_format[0] = 0;
-                          while (ioctl(pPlayer->devFd, AUDIOIOC_GETCAPS, 
+                          while (ioctl(pPlayer->devFd, AUDIOIOC_GETCAPS,
                               (unsigned long) &caps) == caps.ac_len)
                             {
                               /* Check the next set of 4 controls to find the subformat */

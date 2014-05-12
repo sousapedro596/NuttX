@@ -1,7 +1,7 @@
 /************************************************************************************
  * configs/sama5d3x-ek/src/sama5d3x-ek.h
  *
- *   Copyright (C) 2013 Gregory Nutt. All rights reserved.
+ *   Copyright (C) 2013-2014 Gregory Nutt. All rights reserved.
  *   Author: Gregory Nutt <gnutt@nuttx.org>
  *
  * Redistribution and use in source and binary forms, with or without
@@ -108,27 +108,27 @@
 #endif
 
 /* If we are going to mount the NAND, then they user must also have told
- * us what to do with it by setting one of CONFIG_SAMA5_NAND_FTL or
- * CONFIG_SAMA5_NAND_NXFFS.
+ * us what to do with it by setting one of CONFIG_SAMA5D3xEK_NAND_FTL or
+ * CONFIG_SAMA5D3xEK_NAND_NXFFS.
  */
 
 #ifndef CONFIG_MTD
-#  undef CONFIG_SAMA5_NAND_NXFFS
-#  undef CONFIG_SAMA5_NAND_FTL
+#  undef CONFIG_SAMA5D3xEK_NAND_NXFFS
+#  undef CONFIG_SAMA5D3xEK_NAND_FTL
 #endif
 
 #if !defined(CONFIG_FS_NXFFS) || !defined(CONFIG_NXFFS_NAND)
-#  undef CONFIG_SAMA5_NAND_NXFFS
+#  undef CONFIG_SAMA5D3xEK_NAND_NXFFS
 #endif
 
-#if !defined(CONFIG_SAMA5_NAND_FTL) && !defined(CONFIG_SAMA5_NAND_NXFFS)
+#if !defined(CONFIG_SAMA5D3xEK_NAND_FTL) && !defined(CONFIG_SAMA5D3xEK_NAND_NXFFS)
 #  undef HAVE_NAND
 #endif
 
-#if defined(CONFIG_SAMA5_NAND_FTL) && defined(CONFIG_SAMA5_NAND_NXFFS)
-#  warning Both CONFIG_SAMA5_NAND_FTL and CONFIG_SAMA5_NAND_NXFFS are set
-#  warning Ignoring CONFIG_SAMA5_NAND_NXFFS
-#  undef CONFIG_SAMA5_NAND_NXFFS
+#if defined(CONFIG_SAMA5D3xEK_NAND_FTL) && defined(CONFIG_SAMA5D3xEK_NAND_NXFFS)
+#  warning Both CONFIG_SAMA5D3xEK_NAND_FTL and CONFIG_SAMA5D3xEK_NAND_NXFFS are set
+#  warning Ignoring CONFIG_SAMA5D3xEK_NAND_NXFFS
+#  undef CONFIG_SAMA5D3xEK_NAND_NXFFS
 #endif
 
 /* AT25 Serial FLASH */
@@ -142,7 +142,7 @@
  * asked to mount the AT25 part
  */
 
-#if defined(CONFIG_DISABLE_MOUNTPOINT) || !defined(CONFIG_SAMA5_AT25_AUTOMOUNT)
+#if defined(CONFIG_DISABLE_MOUNTPOINT) || !defined(CONFIG_SAMA5D3xEK_AT25_AUTOMOUNT)
 #  undef HAVE_AT25
 #endif
 
@@ -151,17 +151,17 @@
  */
 
 #ifndef CONFIG_FS_NXFFS
-#  undef CONFIG_SAMA5_AT25_NXFFS
+#  undef CONFIG_SAMA5D3xEK_AT25_NXFFS
 #endif
 
-#if !defined(CONFIG_SAMA5_AT25_FTL) && !defined(CONFIG_SAMA5_AT25_NXFFS)
+#if !defined(CONFIG_SAMA5D3xEK_AT25_FTL) && !defined(CONFIG_SAMA5D3xEK_AT25_NXFFS)
 #  undef HAVE_AT25
 #endif
 
-#if defined(CONFIG_SAMA5_AT25_FTL) && defined(CONFIG_SAMA5_AT25_NXFFS)
-#  warning Both CONFIG_SAMA5_AT25_FTL and CONFIG_SAMA5_AT25_NXFFS are set
-#  warning Ignoring CONFIG_SAMA5_AT25_NXFFS
-#  undef CONFIG_SAMA5_AT25_NXFFS
+#if defined(CONFIG_SAMA5D3xEK_AT25_FTL) && defined(CONFIG_SAMA5D3xEK_AT25_NXFFS)
+#  warning Both CONFIG_SAMA5D3xEK_AT25_FTL and CONFIG_SAMA5D3xEK_AT25_NXFFS are set
+#  warning Ignoring CONFIG_SAMA5D3xEK_AT25_NXFFS
+#  undef CONFIG_SAMA5D3xEK_AT25_NXFFS
 #endif
 
 /* AT24 Serial EEPROM
@@ -192,7 +192,7 @@
  * asked to mount the AT25 part
  */
 
-#if defined(CONFIG_DISABLE_MOUNTPOINT) || !defined(CONFIG_SAMA5_AT24_AUTOMOUNT)
+#if defined(CONFIG_DISABLE_MOUNTPOINT) || !defined(CONFIG_SAMA5D3xEK_AT24_AUTOMOUNT)
 #  undef HAVE_AT24
 #endif
 
@@ -201,17 +201,17 @@
  */
 
 #ifndef CONFIG_FS_NXFFS
-#  undef CONFIG_SAMA5_AT24_NXFFS
+#  undef CONFIG_SAMA5D3xEK_AT24_NXFFS
 #endif
 
-#if !defined(CONFIG_SAMA5_AT24_FTL) && !defined(CONFIG_SAMA5_AT24_NXFFS)
+#if !defined(CONFIG_SAMA5D3xEK_AT24_FTL) && !defined(CONFIG_SAMA5D3xEK_AT24_NXFFS)
 #  undef HAVE_AT24
 #endif
 
-#if defined(CONFIG_SAMA5_AT24_FTL) && defined(CONFIG_SAMA5_AT24_NXFFS)
-#  warning Both CONFIG_SAMA5_AT24_FTL and CONFIG_SAMA5_AT24_NXFFS are set
-#  warning Ignoring CONFIG_SAMA5_AT24_NXFFS
-#  undef CONFIG_SAMA5_AT24_NXFFS
+#if defined(CONFIG_SAMA5D3xEK_AT24_FTL) && defined(CONFIG_SAMA5D3xEK_AT24_NXFFS)
+#  warning Both CONFIG_SAMA5D3xEK_AT24_FTL and CONFIG_SAMA5D3xEK_AT24_NXFFS are set
+#  warning Ignoring CONFIG_SAMA5D3xEK_AT24_NXFFS
+#  undef CONFIG_SAMA5D3xEK_AT24_NXFFS
 #endif
 
 /* Assign minor device numbers.  For example, if we also use MINOR number 0
@@ -238,7 +238,7 @@
 #  define AT24_MINOR  _AT24_MINOR
 #endif
 
-/* MMC/SD minor numbers:  The NSH device minor extended is extened to support
+/* MMC/SD minor numbers:  The NSH device minor extended is extended to support
  * two devices.  If CONFIG_NSH_MMCSDMINOR is zero, these will be:  /dev/mmcsd0
  * and /dev/mmcsd1.
  */
@@ -322,7 +322,7 @@
 
 #define OV2640_BUS 1
 
-#ifndef CONFIG_SAMA5_OV2640_DEMO
+#ifndef CONFIG_SAMA5D3xEK_OV2640_DEMO
 #  undef HAVE_CAMERA
 #endif
 
@@ -349,12 +349,19 @@
  *   that it is illuminated when power is applied even if PE24 is not
  *   configured as an output.  If PE24 is configured as an output, then the
  *   LCD is illuminated by a high output.
+ *
+ *     N.B. PE24 Drives the RED Led on the CM (SODIMM200), but unfortunately
+ *     it is also connected to ISI_RST on the MB (Main Board) and controlling
+ *     it will reset a Camera connected to the ISI
  */
 
 #define PIO_BLUE     (PIO_OUTPUT | PIO_CFG_PULLUP | PIO_OUTPUT_SET | \
                       PIO_PORT_PIOE | PIO_PIN25)
-#define PIO_RED      (PIO_OUTPUT | PIO_CFG_PULLUP | PIO_OUTPUT_CLEAR | \
+
+#ifndef CONFIG_SAMA5D3xEK_NOREDLED
+#  define PIO_RED    (PIO_OUTPUT | PIO_CFG_PULLUP | PIO_OUTPUT_CLEAR | \
                       PIO_PORT_PIOE | PIO_PIN24)
+#endif
 
 /* Buttons **************************************************************************/
 /* There are five push button switches on the SAMA5D3X-EK base board:
@@ -368,7 +375,7 @@
  * Only the momentary push button is controllable by software (labeled
  * "PB_USER1" on the board):
  *
- *   - PE27.  Pressing the switch connect PE27 to grounded.  Therefore, PE27
+ *   - PE27.  Pressing the switch connects PE27 to ground.  Therefore, PE27
  *     must be pulled high internally.  When the button is pressed the SAMA5
  *     will sense "0" is on PE27.
  */
@@ -582,7 +589,7 @@
  * Name: sam_spiinitialize
  *
  * Description:
- *   Called to configure SPI chip select PIO pins for the SAMA4D3x-EK board.
+ *   Called to configure SPI chip select PIO pins for the SAMA5D3x-EK board.
  *
  ************************************************************************************/
 

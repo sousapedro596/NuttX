@@ -19,7 +19,7 @@ apps include:
 
   dhcpc     - Dynamic Host Configuration Protocol (DHCP) client.  See
               apps/include/netutils/dhcpc.h for interface information.
-  resolv    - uIP DNS resolver.  See apps/include/netutils/resolv.h
+  dnsclient - uIP DNS resolver.  See apps/include/netutils/dnsclient.h
               for interface information.
   smtp      - Simple Mail Transfer Protocol (SMTP) client.  See
               apps/include/netutils/smtp.h for interface information.
@@ -65,6 +65,8 @@ highly influenced by uIP) include:
               information.
   ftpd      - FTP server.   See apps/include/netutils/ftpd.h for interface
               information.
+  ntpclient - This is a fragmentary NTP client.  It neither well-tested
+              nor mature nor complete at this point in time.
   thttpd    - This is a port of Jef Poskanzer's THTTPD HTPPD server.
               See http://acme.com/software/thttpd/ for general THTTPD
               information.  See apps/include/netutils/thttpd.h

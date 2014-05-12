@@ -1,7 +1,7 @@
 /****************************************************************************
  * arch/hc/src/m9s12/m9s12_assert.c
  *
- *   Copyright (C) 2011-2013 Gregory Nutt. All rights reserved.
+ *   Copyright (C) 2011-2014 Gregory Nutt. All rights reserved.
  *   Author: Gregory Nutt <gnutt@nuttx.org>
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,6 +46,8 @@
 
 #include <nuttx/irq.h>
 #include <nuttx/arch.h>
+#include <nuttx/usb/usbdev_trace.h>
+
 #include <arch/board/board.h>
 
 #include "up_arch.h"
@@ -55,8 +57,13 @@
 /****************************************************************************
  * Pre-processor Definitions
  ****************************************************************************/
+/* USB trace dumping */
 
-/* Output debug info if stack dump is selected -- even if 
+#ifndef CONFIG_USBDEV_TRACE
+#  undef CONFIG_ARCH_USBDUMP
+#endif
+
+/* Output debug info if stack dump is selected -- even if
  * debug is not selected.
  */
 
@@ -150,6 +157,18 @@ static inline void up_registerdump(void)
 #endif
 
 /****************************************************************************
+ * Name: assert_tracecallback
+ ****************************************************************************/
+
+#ifdef CONFIG_ARCH_USBDUMP
+static int assert_tracecallback(struct usbtrace_s *trace, void *arg)
+{
+  usbtrace_trprintf((trprintf_t)lowsyslog, trace->event, trace->value);
+  return 0;
+}
+#endif
+
+/****************************************************************************
  * Name: up_dumpstate
  ****************************************************************************/
 
@@ -238,6 +257,12 @@ static void up_dumpstate(void)
   /* Then dump the registers (if available) */
 
   up_registerdump();
+
+#ifdef CONFIG_ARCH_USBDUMP
+  /* Dump USB trace data */
+
+  (void)usbtrace_enumerate(assert_tracecallback, NULL);
+#endif
 }
 #else
 # define up_dumpstate()
@@ -255,7 +280,7 @@ static void _up_assert(int errorcode)
   if (current_regs || ((struct tcb_s*)g_readytorun.head)->pid == 0)
     {
        (void)irqsave();
-        for(;;)
+        for (;;)
           {
 #ifdef CONFIG_ARCH_LEDS
             board_led_on(LED_PANIC);

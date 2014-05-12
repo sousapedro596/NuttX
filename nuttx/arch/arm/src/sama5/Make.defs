@@ -1,7 +1,7 @@
 ############################################################################
 # arch/arm/sama5/Make.defs
 #
-#   Copyright (C) 2013 Gregory Nutt. All rights reserved.
+#   Copyright (C) 2013-2014 Gregory Nutt. All rights reserved.
 #   Author: Gregory Nutt <gnutt@nuttx.org>
 #
 # Redistribution and use in source and binary forms, with or without
@@ -54,6 +54,10 @@ CMN_ASRCS += arm_saveusercontext.S arm_vectoraddrexcptn.S arm_vfork.S
 CMN_ASRCS += cp15_coherent_dcache.S cp15_invalidate_dcache.S
 CMN_ASRCS += cp15_clean_dcache.S cp15_flush_dcache.S cp15_invalidate_dcache_all.S
 
+ifeq ($(CONFIG_ARCH_MEMCPY),y)
+CMN_ASRCS += arm_memcpy.S
+endif
+
 # Common C source files
 
 CMN_CSRCS  = up_initialize.c up_idle.c up_interruptcontext.c up_exit.c
@@ -94,8 +98,8 @@ CHIP_ASRCS  =
 # SAMA5-specific C source files
 
 CHIP_CSRCS  = sam_allocateheap.c sam_boot.c sam_clockconfig.c sam_irq.c
-CHIP_CSRCS += sam_lowputc.c sam_memories.c sam_pck.c sam_pio.c sam_serial.c
-CHIP_CSRCS += sam_timerisr.c
+CHIP_CSRCS += sam_lowputc.c sam_memories.c sam_pck.c sam_pio.c sam_pmc.c
+CHIP_CSRCS += sam_serial.c sam_timerisr.c
 
 # Configuration dependent C and assembly language files
 
@@ -117,6 +121,10 @@ endif
 
 ifeq ($(CONFIG_SAMA5_WDT),y)
 CHIP_CSRCS += sam_wdt.c
+endif
+
+ifeq ($(CONFIG_SAMA5_DBGU),y)
+CHIP_CSRCS += sam_dbgu.c
 endif
 
 ifeq ($(CONFIG_SAMA5_TRNG),y)
@@ -158,6 +166,7 @@ ifeq ($(CONFIG_SAMA5_UDPHS),y)
 CHIP_CSRCS += sam_udphs.c
 endif
 
+ifeq ($(CONFIG_USBHOST),y)
 ifeq ($(CONFIG_USBHOST_TRACE),y)
 CHIP_CSRCS += sam_usbhost.c
 else
@@ -165,15 +174,16 @@ ifeq ($(CONFIG_DEBUG_USB),y)
 CHIP_CSRCS += sam_usbhost.c
 endif
 endif
+endif
 
 ifeq ($(CONFIG_SAMA5_HSMCI0),y)
-CHIP_CSRCS += sam_hsmci.c
+CHIP_CSRCS += sam_hsmci.c sam_hsmci_clkdiv.c
 else
 ifeq ($(CONFIG_SAMA5_HSMCI1),y)
-CHIP_CSRCS += sam_hsmci.c
+CHIP_CSRCS += sam_hsmci.c sam_hsmci_clkdiv.c
 else
 ifeq ($(CONFIG_SAMA5_HSMCI2),y)
-CHIP_CSRCS += sam_hsmci.c
+CHIP_CSRCS += sam_hsmci.c sam_hsmci_clkdiv.c
 endif
 endif
 endif

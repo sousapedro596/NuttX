@@ -440,7 +440,7 @@ exception_common:
 	ldr		r14, =EXC_RETURN_PRIVTHR	/* Load the special value */
 #endif
 
-    /* Restore the interrupt state */
+	/* Restore the interrupt state */
 
 #ifdef CONFIG_ARMV7M_USEBASEPRI
 	msr		basepri, r3				/* Restore interrupts priority masking */
@@ -469,6 +469,7 @@ exception_common:
 
 #if CONFIG_ARCH_INTERRUPTSTACK > 3
 	.bss
+	.global	g_intstackalloc
 	.global	g_intstackbase
 	.align	4
 g_intstackalloc:

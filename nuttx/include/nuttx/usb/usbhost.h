@@ -1,7 +1,7 @@
 /************************************************************************************
  * include/nuttx/usb/usbhost.h
  *
- *   Copyright (C) 2010-2013 Gregory Nutt. All rights reserved.
+ *   Copyright (C) 2010-2014 Gregory Nutt. All rights reserved.
  *   Author: Gregory Nutt <gnutt@nuttx.org>
  *
  * References:
@@ -561,7 +561,7 @@ struct usbhost_registry_s
    * environments where there may be multiple USB ports and multiple USB devices
    * simultaneously connected (see the CLASS_CREATE() macro above).
    */
- 
+
   FAR struct usbhost_class_s     *(*create)(FAR struct usbhost_driver_s *drvr,
                                            FAR const struct usbhost_id_s *id);
 
@@ -798,6 +798,7 @@ int usbhost_registerclass(struct usbhost_registry_s *class);
 
 const struct usbhost_registry_s *usbhost_findclass(const struct usbhost_id_s *id);
 
+#ifdef CONFIG_USBHOST_MSC
 /****************************************************************************
  * Name: usbhost_storageinit
  *
@@ -816,7 +817,9 @@ const struct usbhost_registry_s *usbhost_findclass(const struct usbhost_id_s *id
  ****************************************************************************/
 
 int usbhost_storageinit(void);
+#endif
 
+#ifdef CONFIG_USBHOST_HIDKBD
 /****************************************************************************
  * Name: usbhost_kbdinit
  *
@@ -835,7 +838,9 @@ int usbhost_storageinit(void);
  ****************************************************************************/
 
 int usbhost_kbdinit(void);
+#endif
 
+#ifdef CONFIG_USBHOST_HIDMOUSE
 /****************************************************************************
  * Name: usbhost_mouse_init
  *
@@ -854,6 +859,7 @@ int usbhost_kbdinit(void);
  ****************************************************************************/
 
 int usbhost_mouse_init(void);
+#endif
 
 /****************************************************************************
  * Name: usbhost_wlaninit

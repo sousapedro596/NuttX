@@ -188,7 +188,7 @@ extern "C"
  * Description:
  *   Given an instance of an MTD driver, create a flash partition, ie.,
  *   another MTD driver instance that only operates with a sub-region of
- *   FLASH media.  That sub-region is defined by a sector offsetset and a
+ *   FLASH media.  That sub-region is defined by a sector offset and a
  *   sector count (where the size of a sector is provided the by parent MTD
  *   driver).
  *
@@ -197,6 +197,15 @@ extern "C"
  *   of enforcing mutually exclusive access to the FLASH device.  Without
  *   partitions, that mutual exclusion would be provided by the file system
  *   above the FLASH driver.
+ *
+ * Input parameters:
+ *   mtd        - The MTD device to be partitioned
+ *   firstblock - The offset in bytes to the first block
+ *   nblocks    - The number of blocks in the partition
+ *
+ * Returned Value:
+ *   On success, another MTD device representing the partition is returned.
+ *   A NULL value is returned on a failure.
  *
  ****************************************************************************/
 
@@ -265,6 +274,24 @@ int smart_initialize(int minor, FAR struct mtd_dev_s *mtd,
  * driver but, but are created as instances that can be bound to other
  * functions (such as a block or character driver front end).
  */
+
+/************************************************************************************
+ * Name: s512_initialize
+ *
+ * Description:
+ *   Create an initialized MTD device instance.  This MTD driver contains another
+ *   MTD driver and converts a larger sector size to a standard 512 byte sector
+ *   size.
+ *
+ *   MTD devices are not registered in the file system, but are created as instances
+ *   that can be bound to other functions (such as a block or character driver front
+ *   end).
+ *
+ ************************************************************************************/
+
+#ifdef CONFIG_MTD_SECT512
+FAR struct mtd_dev_s *s512_initialize(FAR struct mtd_dev_s *mtd);
+#endif
 
 /****************************************************************************
  * Name: at45db_initialize
@@ -386,7 +413,7 @@ FAR struct mtd_dev_s *up_flashinitialize(void);
  *
  * Description:
  *   Registers MTD device with the procfs file system.  This assigns a unique
- *   MTD number and associates the given device name, then  add adds it to 
+ *   MTD number and associates the given device name, then  add adds it to
  *   the list of registered devices.
  *
  * In an embedded system, this all is really unnecessary, but is provided

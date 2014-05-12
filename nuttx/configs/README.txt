@@ -268,7 +268,7 @@ configs/lm3s8962-ek
 configs/lm4f120-launchpad
   This is the port of NuttX to the Stellaris LM4F120 LaunchPad.  The
   Stellaris® LM4F120 LaunchPad Evaluation Board is a low-cost evaluation
-  platform for ARM® Cortex™-M4F-based microcontrollers from Texas\
+  platform for ARM® Cortex™-M4F-based microcontrollers from Texas
   Instruments.
 
 configs/lpcxpresso-lpc1768
@@ -334,6 +334,9 @@ configs/ntosd-dm320
   NuttX operates on the ARM9EJS of this dual core processor.
   STATUS: This port is code complete, verified, and included in the
   NuttX 0.2.1 release.
+
+configs/nucleo-f401re
+  STMicro ST Nucleo F401RE http://mbed.org/platforms/ST-Nucleo-F401RE
 
 configs/nucleus2g
   This port uses the Nucleus 2G board (with Babel CAN board).  This board
@@ -466,8 +469,10 @@ configs/sama5d3x-ek
   are supported by NuttX with a simple reconfiguration of the processor
   type.
 
-  There is also the SAMA5D3FAE-EK bundle includes everything:  The base
-  board, all four CPU modules, and the LCD.
+configs/sama5d3-xplained
+  This is the  port of NuttX to the Atmel SAMA5D3x-Xplained development board.
+  This board features the Atmel SAMA5D36.  See
+  http://www.atmel.com/devices/sama5d36.aspx.
 
 configs/samd20-xplained
   The port of NuttX to the Atmel SAMD20-Xplained Pro development board.  This
@@ -477,8 +482,18 @@ configs/samd20-xplained
 configs/sam3u-ek
   The port of NuttX to the Atmel SAM3U-EK development board.
 
+configs/sam4e-ek
+  The port of NuttX to the Atmel SAM4E-EK development board.  This board
+  features the SAM4E16 MCU running at up to 120MHz.
+
 configs/sam4l-xplained
   The port of NuttX to the Atmel SAM4L-Xplained development board.
+
+configs/sam4s-xplained
+  The port of NuttX to the Atmel SAM4S-Xplained development board.
+
+configs/sam4s-xplained-pro
+  The port of NuttX to the Atmel SAM4S-Xplained Pro development board.
 
 configs/sim
   A user-mode port of NuttX to the x86 Linux platform is available.
@@ -542,6 +557,12 @@ configs/teensy
   This is the port of NuttX to the PJRC Teensy++ 2.0 board.  This board is
   developed by http://pjrc.com/teensy/.  The Teensy++ 2.0 is based
   on an Atmel AT90USB1286 MCU.
+
+configs/tm4c123g-launchpad
+  This is the port of NuttX to the Tiva TM4C123G LaunchPad.  The
+  Tiva® TM4C123G LaunchPad Evaluation Board is a low-cost evaluation
+  platform for ARM® Cortex™-M4F-based microcontrollers from Texas
+  Instruments.
 
 configs/twr-k60n512
   Kinetis K60 Cortex-M4 MCU.  This port uses the FreeScale TWR-K60N512

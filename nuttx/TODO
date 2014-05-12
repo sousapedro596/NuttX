@@ -1,4 +1,4 @@
-NuttX TODO List (Last updated January 10, 2014)
+NuttX TODO List (Last updated April 23, 2014)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This file summarizes known NuttX bugs, limitations, inconsistencies with
@@ -15,9 +15,9 @@ nuttx/
  (11)  Kernel Build
   (4)  C++ Support
   (6)  Binary loaders (binfmt/)
- (17)  Network (net/, drivers/net)
+ (16)  Network (net/, drivers/net)
   (4)  USB (drivers/usbdev, drivers/usbhost)
- (11)  Libraries (libc/, )
+ (10)  Libraries (libc/, )
  (12)  File system/Generic drivers (fs/, drivers/)
   (5)  Graphics subystem (graphics/)
   (1)  Pascal add-on (pcode/)
@@ -48,8 +48,8 @@ nuttx/
 
 apps/
 
-  (5)  Network Utilities (apps/netutils/)
-  (4)  NuttShell (NSH) (apps/nshlib)
+  (4)  Network Utilities (apps/netutils/)
+  (3)  NuttShell (NSH) (apps/nshlib)
   (1)  System libraries apps/system (apps/system)
   (5)  Other Applications & Tests (apps/examples/)
 
@@ -376,7 +376,7 @@ o Kernel Build
 
                COMMAND  KERNEL INTERFACE(s)
                -------- ----------------------------------------------
-               loset    losetup(), loteardown()
+               losetup  losetup(), loteardown()
                mkfatfs  mkfatfs
                mkrd     ramdisk_register()
                dd       bchlib_setup(), bchlib_read(), bchlib_write(),
@@ -900,17 +900,6 @@ o Network (net/, drivers/net)
   Status:      Open
   Priority:    Low unless you need it.
 
-  Title:       UNTESTED IGMPv2
-  Description: Support for client-side IGMPv2 multicast has been added but not yet
-               tested (because I don't have a proper environment for multicast testing).
-               There are most likely errors that need to be fixed at least in the
-               receipt of multicast packets.
-
-               In addition, an Ethernet driver that needs to work with the IGMP logic
-               will have to include additional support for multicast MAC address tables.
-  Status:      Open
-  Priority:    Low unless you need it.
-
   Title:       INTERFACES TO LEAVE/JOIN IGMP MULTICAST GROUP
   Description: The interfaces used to leave/join IGMP multicast groups is non-standard.
                RFC3678 (IGMPv3) suggests ioctl() commands to do this (SIOCSIPMSFILTER) but
@@ -927,18 +916,14 @@ o Network (net/, drivers/net)
                the mechanism for leaving and joining groups is hidden behind a wrapper
                function so that little of this incompatibilities need be exposed.
 
-  Title:       CONFIGURATIONS WITH TINY MTUS
-  Description: Many configurations have the MTU (CONFIG_NET_BUFSIZE) set to very small
-               numbers, less then the minimum MTU size that must be supported -- 576.
-               This can cause problems in some networks:  CONFIG_NET_BUFSIZE should
-               be set to at least 576 in all defconfig files.
-
-               The symptoms of using very small MTU sizes can be very strange.  With
-               Ubuntu 9.x and vsFtpd was that the total packet size did *not match* the
-               packet size in the IP header.  This then caused a TCP checksum failure
-               and the packet was rejected.
+  Title:       CLOSED CONNECTIONS IN THE BACKLOG
+               If a connection is backlogged but accept() is not called quickly, then
+               that connection may time out.  How should this be handled?  Should the
+               connection be removed from the backlog if it is times out or is closed?
+               Or should it remain in the backlog with a status indication so that accept()
+               can fail when it encounteres the invalid connection?
   Status:      Open
-  Priority:    Low... fix defconfig files as necessary.
+  Priority:    Medium.  Important on slow applications that will not accept connections promptly.
 
 o USB (drivers/usbdev, drivers/usbhost)
   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -947,6 +932,30 @@ o USB (drivers/usbdev, drivers/usbhost)
   Description: There is a workaround for a bug in drivers/usbdev/usbdev_storage.c.
                that involves delays.  This needs to be redesigned to eliminate these
                delays.  See logic conditioned on CONFIG_USBMSC_RACEWAR.
+
+               If queuing of stall requests is supported by DCD then this workaround
+               is not required.  In this case, (1) the stall is not sent until all
+               write requests preceding the stall request are sent, (2) the stall is
+               sent, and then after the stall is cleared, (3) all write requests
+               queued after the stall are sent.
+
+               See, for example, the queuing of pending stall requests in the SAM3/4
+               UDP driver at arch/arm/src/sam34/sam_udp.c.  There the logic is do this
+               is implemented with a normal request queue, a pending request queue, a
+               stall flag and a stall pending flag:
+
+               1) If the normal request queue is not empty when the STALL request is
+                  received, the stall pending flag is set.
+               2) If addition write requests are received while the stall pending flag
+                  is set (or while waiting for the stall to be sent), those write requests
+                  go into the pending queue.
+               3) When the normal request queue empties successful and all of the write
+                  transfers complete, the STALL is sent.  The stall pending flag is
+                  cleared and the stall flag is set.  Now the endpoint is really stalled.
+               4) After the STALL is cleared (via the Clear Feature SETUP), the pending
+                  request queue is copied to the normal request queue, the stall flag is
+                  cleared, and normal write request processing resumes.
+
   Status:      Open
   Priority:    Medium
 
@@ -1074,23 +1083,6 @@ o Libraries (libc/)
                The current getopt() implementation only supports #2.
   Status:      Open
   Priority:    Low
-
-  Title:       FERROR()
-  Description: ferror(), feof(), and clearerror() are present, but the
-               implementation of ferror() is limited.  There are flags in the
-               stream structure to indicate EOF and error conditions but nothing
-               in the code currently sets the error indication.  This is a
-               trivial change to many interfaces and has not yet been done.
-               Instead, for now, ferror() is equivalent to !feof().  If an
-               interface can failure because of an error or and EOF and you
-               only want to distinguish between an error and the EOF then
-               this ferror() will work.  However, if no error is reported then
-               this ferror() cannot tell you if an error has occurred or not.
-  Status:      Open
-  Priority:    Meidum to Low:  Some applications use ferror() and not the
-               return value to determine if an error occurred.  Those
-               applications will fail with this limited implementation of
-               ferror().
 
   Title:       CONCURRENT STREAM READ/WRITE
   Description: NuttX only supports a single file pointer so reads and writes
@@ -1247,9 +1239,9 @@ o File system / Generic drivers (fs/, drivers/)
                   AtEsT.tXt
                   aTeSt.TxT
                  nsh> cat /tmp/aTeSt.TxT
-                 Test2 
+                 Test2
                  nsh> cat /tmp/AtEsT.tXt
-                 Test1 
+                 Test1
 
   Status:      Open
   Priority:    Low
@@ -2302,14 +2294,6 @@ o mc68hc1x (arch/hc)
 
 o Network Utilities (apps/netutils/)
 
-  Title:       UIP RESOLVER
-  Description: One critical part of netutils/ apps is untested: The uIP
-               resolver in netutils/resolv.  The webclient code has been
-               tested on host using gethosbyname(), but still depends on the
-               untested resolve logic.
-  Status:      Open
-  Priority:    Medium, Important but not core NuttX functionality
-
   Title:       PPP PORT
   Description: Port PPP support from http://contiki.cvs.sourceforge.net/contiki/contiki-2.x/backyard/core/net/ppp/
   Status:      Open
@@ -2356,11 +2340,6 @@ o NuttShell (NSH) (apps/nshlib)
                still show status for all interfaces.
   Status:      Open
   Priority:    Low (multiple network interfaces not fully supported yet anyway).
-
-  Title:       RUN NXFLAT PROGRAMS
-  Description: Add support to NSH to run NXFLAT programs from a ROMFS file system
-  Status:      Open
-  Priority:    Low (enhancement)
 
   Title:       ARP COMMAND
   Description: Add an ARP command so that we can see the contents of the ARP table.

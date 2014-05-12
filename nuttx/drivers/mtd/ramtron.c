@@ -37,9 +37,16 @@
  ************************************************************************************/
 
 /* OPTIONS:
- *  - additional non-jedec standard device: FM25H20 
+ *  - additional non-jedec standard device: FM25H20
  *    must be enabled with the CONFIG_RAMTRON_FRAM_NON_JEDEC=y
- * 
+ *
+ * NOTE:
+ *  - frequency is fixed to desired max by RAMTRON_INIT_CLK_MAX
+ *    if new devices with different speed arrive, then SETFREQUENCY()
+ *    needs to handle freq changes and INIT_CLK_MAX must be reduced
+ *    to fit all devices. Note that STM32_SPI driver is prone to
+ *    too high freq. parameters and limit it within physical constraints.
+ *
  * TODO:
  *  - add support for sleep
  *  - add support for faster read FSTRD command
@@ -310,7 +317,10 @@ static inline void ramtron_unlock(FAR struct spi_dev_s *dev)
 
 static inline int ramtron_readid(struct ramtron_dev_s *priv)
 {
-  uint16_t manufacturer, memory, capacity, part;
+  uint16_t manufacturer;
+  uint16_t memory;
+  uint16_t capacity;
+  uint16_t part;
   int i;
 
   fvdbg("priv: %p\n", priv);
@@ -336,15 +346,18 @@ static inline int ramtron_readid(struct ramtron_dev_s *priv)
 
   SPI_SELECT(priv->dev, SPIDEV_FLASH, false);
   ramtron_unlock(priv->dev);
-  
+
   /* Select part from the part list */
- 
+
   for (priv->part = ramtron_parts;
      priv->part->name != NULL && !(priv->part->id1 == capacity && priv->part->id2 == part);
      priv->part++);
-     
+
   if (priv->part->name)
     {
+      UNUSED(manufacturer); /* Eliminate warnings when debug is off */
+      UNUSED(memory);       /* Eliminate warnings when debug is off */
+
       fvdbg("RAMTRON %s of size %d bytes (mf:%02x mem:%02x cap:%02x part:%02x)\n",
             priv->part->name, priv->part->size, manufacturer, memory, capacity, part);
 
@@ -355,7 +368,7 @@ static inline int ramtron_readid(struct ramtron_dev_s *priv)
       priv->speed       = priv->part->speed;
       return OK;
     }
- 
+
   fvdbg("RAMTRON device not found\n");
   return -ENODEV;
 }
@@ -420,7 +433,7 @@ static void ramtron_writeenable(struct ramtron_dev_s *priv)
   /* Send "Write Enable (WREN)" command */
 
   (void)SPI_SEND(priv->dev, RAMTRON_WREN);
-  
+
   /* Deselect the FLASH */
 
   SPI_SELECT(priv->dev, SPIDEV_FLASH, false);
@@ -434,7 +447,7 @@ static void ramtron_writeenable(struct ramtron_dev_s *priv)
 static inline void ramtron_sendaddr(const struct ramtron_dev_s *priv, uint32_t addr)
 {
   DEBUGASSERT(priv->part->addr_len == 3 || priv->part->addr_len == 2);
-  
+
   if (priv->part->addr_len == 3)
     {
       (void)SPI_SEND(priv->dev, (addr >> 16) & 0xff);
@@ -458,7 +471,7 @@ static inline int ramtron_pagewrite(struct ramtron_dev_s *priv, FAR const uint8_
   /* Enable the write access to the FLASH */
 
   ramtron_writeenable(priv);
-  
+
   /* Select this FLASH part */
 
   SPI_SELECT(priv->dev, SPIDEV_FLASH, true);
@@ -474,7 +487,7 @@ static inline int ramtron_pagewrite(struct ramtron_dev_s *priv, FAR const uint8_
   /* Then write the specified number of bytes */
 
   SPI_SNDBLOCK(priv->dev, buffer, 1 << priv->pageshift);
-  
+
   /* Deselect the FLASH: Chip Select high */
 
   SPI_SELECT(priv->dev, SPIDEV_FLASH, false);

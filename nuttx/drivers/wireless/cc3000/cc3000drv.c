@@ -209,7 +209,7 @@ static void *unsoliced_thread_func(void *parameter)
   spiconf.done = sem_open(buff,O_RDONLY);
   DEBUGASSERT(spiconf.done != (sem_t *)-1);
 
-  while(spiconf.run)
+  while (spiconf.run)
     {
       memset(&spiconf.rx_buffer,0,sizeof(spiconf.rx_buffer));
       nbytes = mq_receive(spiconf.queue, &spiconf.rx_buffer,
@@ -264,6 +264,7 @@ void cc3000_open(gcSpiHandleRx pfRxHandler)
       status = pthread_create(&spiconf.unsoliced_thread, &attr,
                               unsoliced_thread_func, NULL);
       DEBUGASSERT(status == 0)
+      UNUSED(status);
    }
 
   DEBUGASSERT(spiconf.cc3000fd);

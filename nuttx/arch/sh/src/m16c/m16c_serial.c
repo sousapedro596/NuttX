@@ -292,6 +292,9 @@ static const struct uart_ops_s g_uart_ops =
   .receive        = up_receive,
   .rxint          = up_rxint,
   .rxavailable    = up_rxavailable,
+#ifdef CONFIG_SERIAL_IFLOWCONTROL
+  .rxflowcontrol  = NULL,
+#endif
   .send           = up_send,
   .txint          = up_txint,
   .txready        = up_txready,
@@ -613,7 +616,7 @@ static int up_setup(struct uart_dev_s *dev)
     {
       dbg("Invalid bits=%d\n", priv->bits);
     }
- 
+
   if (priv->parity != 0)
     {
       regval |= UART_MR_PRYE;
@@ -1075,7 +1078,7 @@ static bool up_txready(struct uart_dev_s *dev)
  * Name: up_earlyconsoleinit
  *
  * Description:
- *   Performs the low level UART initialization early in 
+ *   Performs the low level UART initialization early in
  *   debug so that the serial console will be available
  *   during bootup.  This must be called before up_consoleinit.
  *

@@ -158,7 +158,7 @@ void up_initialize(void);
  *   If CONFIG_BOARD_INITIALIZE is selected, then an additional
  *   initialization call will be performed in the boot-up sequence to a
  *   function called board_initialize().  board_initialize() will be
- *   called immediately after up_intiialize() is called and just before the
+ *   called immediately after up_initialize() is called and just before the
  *   initial application is started.  This additional initialization phase
  *   may be used, for example, to initialize board-specific device drivers.
  *
@@ -1029,6 +1029,28 @@ void up_cxxinitialize(void);
 
 void sched_process_timer(void);
 
+/************************************************************************
+ * Name: sched_process_cpuload
+ *
+ * Description:
+ *   Collect data that can be used for CPU load measurements.
+ *
+ * Inputs:
+ *   None
+ *
+ * Return Value:
+ *   None
+ *
+ * Assumptions/Limitations:
+ *   This function is called from a timer interrupt handler with all
+ *   interrupts disabled.
+ *
+ ************************************************************************/
+
+#if defined(CONFIG_SCHED_CPULOAD) && defined(CONFIG_SCHED_CPULOAD_EXTCLK)
+void weak_function sched_process_cpuload(void);
+#endif
+
 /****************************************************************************
  * Name: irq_dispatch
  *
@@ -1059,10 +1081,14 @@ void irq_dispatch(int irq, FAR void *context);
 
 #if defined(CONFIG_DEBUG) && defined(CONFIG_DEBUG_STACK)
 struct tcb_s;
-size_t up_check_tcbstack(FAR struct tcb_s *tcb);
+size_t  up_check_tcbstack(FAR struct tcb_s *tcb);
 ssize_t up_check_tcbstack_remain(FAR struct tcb_s *tcb);
-size_t up_check_stack(void);
+size_t  up_check_stack(void);
 ssize_t up_check_stack_remain(void);
+#if CONFIG_ARCH_INTERRUPTSTACK > 3
+size_t  up_check_intstack(void);
+size_t  up_check_intstack_remain(void);
+#endif
 #endif
 
 /****************************************************************************

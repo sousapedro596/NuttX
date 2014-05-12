@@ -792,10 +792,6 @@ STM32F4Discovery-specific Configuration Options
 
     CONFIG_HEAP2_SIZE - The size of the SRAM in the FSMC address space (decimal)
 
-    CONFIG_ARCH_IRQPRIO - The STM32F4Discovery supports interrupt prioritization
-
-       CONFIG_ARCH_IRQPRIO=y
-
     CONFIG_ARCH_FPU - The STM32F4Discovery supports a floating point unit (FPU)
 
        CONFIG_ARCH_FPU=y
@@ -1592,7 +1588,7 @@ Where <subdir> is one of the following:
        those are that you cannot get debug output from interrupt handlers.
        So, in particularly, debug output is not a useful way to debug the
        USB device controller driver.  Instead, use the USB monitor with
-       USB debug off and USB trance on (see below).
+       USB debug off and USB trace on (see below).
 
     4. Enabling USB monitor SYSLOG output.  If tracing is enabled, the USB
        device will save encoded trace output in in-memory buffer; if the
