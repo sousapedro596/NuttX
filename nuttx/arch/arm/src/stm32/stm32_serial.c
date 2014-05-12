@@ -1364,13 +1364,13 @@ static void up_set_apb_clock(struct uart_dev_s *dev, bool on)
 #endif
 #ifdef CONFIG_STM32_UART7
     case STM32_UART7_BASE:
-      rcc_en = RCC_APB1ENR_USART5EN;
+      rcc_en = RCC_APB1ENR_UART7EN;
       regaddr = STM32_RCC_APB1ENR;
       break;
 #endif
 #ifdef CONFIG_STM32_UART8
     case STM32_UART8_BASE:
-      rcc_en = RCC_APB1ENR_USART5EN;
+      rcc_en = RCC_APB1ENR_UART8EN;
       regaddr = STM32_RCC_APB1ENR;
       break;
 #endif
