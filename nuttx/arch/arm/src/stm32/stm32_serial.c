@@ -1278,11 +1278,11 @@ static void up_set_format(struct uart_dev_s *dev)
 
   if (priv->parity == 1)       /* Odd parity */
     {
-      regval |= (USART_CR1_PCE|USART_CR1_PS);
+      regval |= (USART_CR1_PCE|USART_CR1_PS|USART_CR1_M);
     }
   else if (priv->parity == 2)  /* Even parity */
     {
-      regval |= USART_CR1_PCE;
+      regval |= (USART_CR1_PCE|USART_CR1_M);
     }
 
   up_serialout(priv, STM32_USART_CR1_OFFSET, regval);
